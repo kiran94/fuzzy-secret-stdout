@@ -13,7 +13,7 @@ coverage:
 	$(if $(GITHUB_ACTIONS),poetry run pytest -q --cov=ssm_view --cov-report=lcov,)
 
 lint:
-	poetry run ruff check $(if $(GITHUB_ACTIONS),--format github,) .
+	poetry run ruff check $(if $(GITHUB_ACTIONS),--output-format github,) .
 
 format:
 	poetry run ruff check --fix .
