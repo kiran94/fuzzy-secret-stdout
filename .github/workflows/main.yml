@@ -1,0 +1,80 @@
+name: main
+on:
+  push:
+    branches:
+      - master
+      - main
+  pull_request:
+
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 10
+    permissions:
+      contents: read
+      pull-requests: write
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ['3.x']
+        # python-version: ['3.8', '3.9', '3.10', '3.x']
+        poetry-version: ['1.4.2']
+        os: [ubuntu-latest]
+        # os: [ubuntu-latest, windows-latest]
+    steps:
+      - uses: actions/checkout@v3
+
+      - uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - uses: abatilo/actions-poetry@v2
+        with:
+          poetry-version: ${{ matrix.poetry-version }}
+
+      - name: Poetry Check
+        run: poetry check
+
+      - name: Install Dependencies
+        run: |
+          poetry build
+          poetry install
+
+      - name: Lint
+        run: make lint
+
+      - name: Test
+        run: make test
+
+      - name: Code Coverage
+        if: matrix.python-version == '3.x' && matrix.poetry-version == '1.4.2' && matrix.os == 'ubuntu-latest' && github.ref != 'refs/heads/main'
+        run: make coverage
+
+      - name: Code Coverage Report
+        if: matrix.python-version == '3.x' && matrix.poetry-version == '1.4.2' && matrix.os == 'ubuntu-latest' && github.ref != 'refs/heads/main'
+        uses: romeovs/lcov-reporter-action@2a28ec3e25fb7eae9cb537e9141603486f810d1a # https://github.com/romeovs/lcov-reporter-action/issues/46
+        with:
+          lcov-file: coverage.lcov
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          delete-old-comments: true
+
+  terraform-lint:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      TERRAFORM_DIRECTORY: terraform
+    steps:
+      - uses: actions/checkout@v3
+      - uses: hashicorp/setup-terraform@v2
+
+      - name: Terraform Init
+        working-directory: ${{ env.TERRAFORM_DIRECTORY }}
+        run: terraform init -input=false -backend=false
+
+      - name: Terraform Format
+        working-directory: ${{ env.TERRAFORM_DIRECTORY }}
+        run: terraform fmt -check
+
+      - name: Terraform Validate
+        working-directory: ${{ env.TERRAFORM_DIRECTORY }}
+        run: terraform validate
