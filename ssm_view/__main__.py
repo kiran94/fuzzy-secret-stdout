@@ -24,5 +24,5 @@ def main():
     for current_result in result['Parameters']:
         print(current_result['Value'])
 
-if __name__ == '__main__':
+if __name__ == '__main__': # pragma: nocover
     main()
