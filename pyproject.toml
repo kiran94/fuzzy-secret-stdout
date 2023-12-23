@@ -1,0 +1,32 @@
+[tool.poetry]
+name = "ssm-view"
+version = "0.1.0"
+description = ""
+authors = ["kiran94"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.11"
+boto3 = "^1.33.11"
+pyfzf = "^0.3.1"
+
+[tool.poetry.group.dev.dependencies]
+ruff = "^0.1.7"
+pytest = "^7.4.3"
+pytest-cov = "^4.1.0"
+pytest-github-actions-annotate-failures = "^0.2.0"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.poetry.scripts]
+ssmview = 'ssm_view.__main__:main'
+
+[tool.ruff]
+line-length = 160
+target-version = "py38"
+
+[tool.ruff.flake8-quotes]
+inline-quotes = "single"
+
