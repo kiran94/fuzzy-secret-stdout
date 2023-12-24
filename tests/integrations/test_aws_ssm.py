@@ -1,5 +1,7 @@
 from unittest.mock import Mock, call
-from ssm_view.ssm import fetch_all_ssm_keys
+from fuzzy_secret_stdout.integrations.aws_ssm import AWSParameterStore
+from fuzzy_secret_stdout.models import SecretStoreItem
+
 
 import pytest
 
@@ -8,12 +10,13 @@ import pytest
     pytest.param({}, id='empty_response'),
     pytest.param({'Parameters': []}, id='empty_parameters')
 ])
-def test_fetch_all_ssm_keys_no_parameters(describe_parameters_return: dict):
+def test_fetch_all_no_parameters(describe_parameters_return: dict):
 
     mock_ssm: Mock = Mock()
     mock_ssm.describe_parameters.return_value = describe_parameters_return
 
-    result = fetch_all_ssm_keys(mock_ssm)
+    integration = AWSParameterStore(mock_ssm)
+    result = integration.fetch_all()
 
     assert result == []
     assert mock_ssm.describe_parameters.call_args_list == [call(MaxResults=3)]
@@ -24,11 +27,12 @@ def test_fetch_all_ssm_keys_no_parameters(describe_parameters_return: dict):
     5,
     10
 ])
-def test_fetch_all_ssm_keys_max_results_override(max_results: int):
+def test_fetch_all_max_results_override(max_results: int):
     mock_ssm: Mock = Mock()
     mock_ssm.describe_parameters.return_value = []
 
-    fetch_all_ssm_keys(mock_ssm, max_batch_results=max_results)
+    integration = AWSParameterStore(mock_ssm)
+    integration.fetch_all(max_batch_results=max_results)
 
     assert mock_ssm.describe_parameters.call_args_list == [call(MaxResults=max_results)]
 
@@ -43,10 +47,15 @@ def test_fetch_all_ssm_keys_no_pagination():
         ]
     }
 
-    result = fetch_all_ssm_keys(mock_ssm)
+    integration = AWSParameterStore(mock_ssm)
+    result = integration.fetch_all()
 
-    assert result == [{'Name': 'param1'}, {'Name': 'param2'}, {'Name': 'param3'}]
     assert mock_ssm.describe_parameters.call_args_list == [call(MaxResults=3)]
+    assert result == [
+        SecretStoreItem(key='param1'),
+        SecretStoreItem(key='param2'),
+        SecretStoreItem(key='param3')
+    ]
 
 def test_fetch_all_ssm_keys_pagination():
 
@@ -70,7 +79,31 @@ def test_fetch_all_ssm_keys_pagination():
         },
     ]
 
-    result = fetch_all_ssm_keys(mock_ssm)
+    integration = AWSParameterStore(mock_ssm)
+    result = integration.fetch_all()
 
-    assert result == [{'Name': 'param1'}, {'Name': 'param2'}, {'Name': 'param3'}, {'Name': 'param4'}]
+    assert result == [
+        SecretStoreItem(key='param1'),
+        SecretStoreItem(key='param2'),
+        SecretStoreItem(key='param3'),
+        SecretStoreItem(key='param4')
+    ]
+
     assert mock_ssm.describe_parameters.call_args_list == [call(MaxResults=3), call(NextToken='token1', MaxResults=3), call(NextToken='token2', MaxResults=3)]
+
+
+def test_fetch_secrets():
+    input = ['param1']
+
+    mock_ssm: Mock = Mock()
+    mock_ssm.get_parameters.return_value = {
+        'Parameters': [
+            {'Name': 'param1', 'Value': 'value1'}
+        ]
+    }
+
+    integration = AWSParameterStore(mock_ssm)
+    result = integration.fetch_secrets(input)
+
+    assert result == [SecretStoreItem(key='param1', value='value1')]
+    assert mock_ssm.get_parameters.call_args_list == [call(Names=['param1'], WithDecryption=True)]

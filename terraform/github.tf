@@ -1,6 +1,6 @@
 resource "github_repository" "main" {
-  name         = "ssm-view"
-  description  = ""
+  name         = "fuzzy-secret-stdout"
+  description  = "Small utility to fuzzy search from a secret store and print the value to stdout"
   visibility   = "private"
   homepage_url = ""
 
@@ -18,6 +18,7 @@ resource "github_repository" "main" {
     "ssm",
     "parameter-store",
     "aws",
+    "secrets"
   ]
 }
 
