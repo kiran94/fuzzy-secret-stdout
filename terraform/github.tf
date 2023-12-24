@@ -1,6 +1,6 @@
 resource "github_repository" "main" {
   name         = "fuzzy-secret-stdout"
-  description  = ""
+  description  = "Small utility to fuzzy search from a secret store and print the value to stdout"
   visibility   = "private"
   homepage_url = ""
 
