@@ -2,10 +2,11 @@ import logging
 from typing import Optional
 
 from ssm_view.models import SecretStoreItem
+from ssm_view.integrations import SecretIntegration
 
 logger = logging.getLogger(__name__)
 
-class AWSParameterStore:
+class AWSParameterStore(SecretIntegration):
 
     def __init__(self, boto_client) -> None:
         self._boto_client = boto_client
