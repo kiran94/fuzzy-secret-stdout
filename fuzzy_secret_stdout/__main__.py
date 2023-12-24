@@ -1,4 +1,3 @@
-import os
 import logging
 
 from pyfzf.pyfzf import FzfPrompt
@@ -10,9 +9,6 @@ from rich.live import Live
 from rich.spinner import Spinner
 from rich.text import Text
 
-
-LOGGING_LEVEL = os.environ.get('LOGGING_LEVEL', logging.WARN)
-logging.basicConfig(format=logging.BASIC_FORMAT, level=LOGGING_LEVEL)
 logger = logging.getLogger(__name__)
 
 
