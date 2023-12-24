@@ -1,8 +1,8 @@
 import logging
 from typing import Optional
 
-from ssm_view.models import SecretStoreItem
-from ssm_view.integrations import SecretIntegration
+from fuzzy_secret_stdout.models import SecretStoreItem
+from fuzzy_secret_stdout.integrations import SecretIntegration
 
 logger = logging.getLogger(__name__)
 

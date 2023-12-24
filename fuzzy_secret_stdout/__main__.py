@@ -3,8 +3,8 @@ import logging
 
 from pyfzf.pyfzf import FzfPrompt
 
-from ssm_view.models import SecretStoreItem
-from ssm_view.integrations.factory import create_integration, Integration
+from fuzzy_secret_stdout.models import SecretStoreItem
+from fuzzy_secret_stdout.integrations.factory import create_integration, Integration
 
 from rich.live import Live
 from rich.spinner import Spinner

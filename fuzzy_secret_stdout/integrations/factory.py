@@ -2,8 +2,8 @@ from enum import Enum
 
 import boto3
 
-from ssm_view.integrations.aws_ssm import AWSParameterStore
-from ssm_view.integrations import SecretIntegration
+from fuzzy_secret_stdout.integrations.aws_ssm import AWSParameterStore
+from fuzzy_secret_stdout.integrations import SecretIntegration
 
 class Integration(str, Enum):
     AWS_SSM = "AWS_SSM"

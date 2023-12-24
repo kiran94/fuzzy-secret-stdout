@@ -1,5 +1,5 @@
 resource "github_repository" "main" {
-  name         = "ssm-view"
+  name         = "fuzzy-secret-stdout"
   description  = ""
   visibility   = "private"
   homepage_url = ""
@@ -18,6 +18,7 @@ resource "github_repository" "main" {
     "ssm",
     "parameter-store",
     "aws",
+    "secrets"
   ]
 }
 

@@ -1,7 +1,7 @@
 from typing import Optional
 from abc import ABC, abstractmethod
 
-from ssm_view.models import SecretStoreItem
+from fuzzy_secret_stdout.models import SecretStoreItem
 
 class SecretIntegration(ABC):
 
