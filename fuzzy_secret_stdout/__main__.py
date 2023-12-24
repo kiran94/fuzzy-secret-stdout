@@ -1,3 +1,4 @@
+import sys
 import logging
 
 from pyfzf.pyfzf import FzfPrompt
@@ -26,7 +27,7 @@ def main():
     result: list[SecretStoreItem] = integration_client.fetch_secrets(selected)
 
     for current_result in result:
-        print(current_result.value)
+        sys.stdout.write(current_result.value)
 
 if __name__ == '__main__': # pragma: nocover
     main()
