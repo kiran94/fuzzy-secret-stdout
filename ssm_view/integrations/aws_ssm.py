@@ -23,8 +23,6 @@ class AWSParameterStore:
         for parameter in raw_result['Parameters']:
             results.append(SecretStoreItem(parameter['Name']))
 
-
-
         while 'NextToken' in raw_result:
             logging.info("found %s ssm keys and a NextToken, fetching next batch", len(raw_result['Parameters']))
 
@@ -37,4 +35,5 @@ class AWSParameterStore:
 
     def fetch_secrets(self, item_names: list[str]) -> list[SecretStoreItem]:
         result = self._boto_client.get_parameters(Names=item_names, WithDecryption=True)
-        return [SecretStoreItem(x['Name'], x['Value']) for x in result['Parameters']]
+        result = [SecretStoreItem(x['Name'], x['Value']) for x in result['Parameters']]
+        return result
