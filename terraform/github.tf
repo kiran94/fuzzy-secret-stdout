@@ -1,7 +1,7 @@
 resource "github_repository" "main" {
   name         = "fuzzy-secret-stdout"
   description  = "Small utility to fuzzy search from a secret store and print the value to stdout"
-  visibility   = "private"
+  visibility   = "public"
   homepage_url = ""
 
   has_projects  = false
@@ -22,13 +22,13 @@ resource "github_repository" "main" {
   ]
 }
 
-# resource "github_branch_protection" "main" {
-#   repository_id       = github_repository.main.node_id
-#   pattern             = "main"
-#   enforce_admins      = false
-#   allows_deletions    = false
-#   allows_force_pushes = false
-# }
+resource "github_branch_protection" "main" {
+  repository_id       = github_repository.main.node_id
+  pattern             = "main"
+  enforce_admins      = false
+  allows_deletions    = false
+  allows_force_pushes = false
+}
 
 # SECRETS
 
