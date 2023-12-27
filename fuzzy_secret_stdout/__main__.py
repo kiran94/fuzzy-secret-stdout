@@ -29,6 +29,11 @@ def main():
     keys: list[str] = [x.key for x in result]
 
     selected: list[str] = search.prompt(keys)
+
+    if not selected:
+        logger.debug("nothing was selected, exiting early.")
+        return
+
     result: list[SecretStoreItem] = integration_client.fetch_secrets(selected)
 
     for current_result in result:
