@@ -19,4 +19,4 @@ def test_create_integration_unimplemented():
         create_integration("DUMMY")
 
 def test_integration_list_options():
-    assert Integration.list_options() == ['AWS_SSM', 'AWS_SECRET_MAN']
+    assert Integration.list_options() == ['AWS_SSM']

@@ -7,7 +7,6 @@ from fuzzy_secret_stdout.integrations import SecretIntegration
 
 class Integration(str, Enum):
     AWS_SSM = "AWS_SSM"
-    AWS_SECRET_MAN = "AWS_SECRET_MAN"
 
     @staticmethod
     def list_options() -> list[str]:

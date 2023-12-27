@@ -16,7 +16,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: ['3.x']
+        python-version: ['3.9']
         # python-version: ['3.8', '3.9', '3.10', '3.x']
         poetry-version: ['1.4.2']
         os: [ubuntu-latest]
@@ -78,3 +78,91 @@ jobs:
       - name: Terraform Validate
         working-directory: ${{ env.TERRAFORM_DIRECTORY }}
         run: terraform validate
+
+
+  release:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    needs: [build, terraform-lint]
+    permissions:
+      contents: write
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@v3
+      - uses: abatilo/actions-poetry@v2
+
+      - name: Release
+        id: release
+        uses: go-semantic-release/action@v1
+        if: github.ref == 'refs/heads/main'
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          allow-initial-development-versions: true
+
+      # Prerelease
+      - name: Bump Poetry (Prerelease)
+        id: prerelease
+        if: github.ref != 'refs/heads/main' && github.event_name == 'pull_request'
+        run: |
+          python -m pip install semantic-version
+
+          # extract the current version
+          VERSION=$(cat pyproject.toml | grep "^version =" | cut -d= -f2 | sed 's/"//g' | sed 's/^\s*\|\s*$//g')
+
+          # bump the version
+          # it's difficult to know if this should be patch, minor, major ahead of time as it would require running the actual release action
+          VERSION=$(python -c "from semantic_version import Version; v = Version('${VERSION}'); v = v.next_patch(); print(v)")
+
+          # add prerelease version identifier
+          VERSION="${VERSION}b${{ github.run_number }}" # _${{ github.run_attempt }}"
+
+          poetry version $VERSION
+
+          # ensure the published package links back to the pull request
+          PULL_REQUEST_NUMBER=$(jq --raw-output .pull_request.number "$GITHUB_EVENT_PATH")
+          sed "s/repository =.*/repository = \"https:\/\/github.com\/kiran94\/fuzzy-secret-stdout\/pull\/$PULL_REQUEST_NUMBER\"/" pyproject.toml -i
+
+          echo "VERSION=${VERSION}" >> $GITHUB_OUTPUT
+
+      - name: Deploy (Prerelease)
+        if: github.ref != 'refs/heads/main' && github.event_name == 'pull_request'
+        run: |
+          poetry build
+          poetry publish -u __token__ -p $POETRY_PYPI_TOKEN_PYPI
+        env:
+          POETRY_PYPI_TOKEN_PYPI: ${{ secrets.POETRY_PYPI_TOKEN_PYPI }}
+
+      - name: Comment (Prerelease)
+        if: github.ref != 'refs/heads/main' && github.event_name == 'pull_request'
+        uses: thollander/actions-comment-pull-request@v2
+        with:
+          message: |
+            Change was prereleased to pypi. Try it out :rocket:
+
+            ```bash
+            python -m pip install fuzzy-secret-stdout==${{steps.prerelease.outputs.VERSION}}
+            ```
+
+            https://pypi.org/project/fuzzy-secret-stdout/${{steps.prerelease.outputs.VERSION}}/
+
+          comment_tag: execution
+
+      # Main Release
+      - name: Bump Poetry
+        if: github.ref == 'refs/heads/main' && steps.release.outputs.version != ''
+        run: poetry version ${{ steps.release.outputs.version }}
+
+      - name: Deploy
+        if: github.ref == 'refs/heads/main' && steps.release.outputs.version != ''
+        run: |
+          poetry build
+          poetry publish -u __token__ -p $POETRY_PYPI_TOKEN_PYPI
+        env:
+          POETRY_PYPI_TOKEN_PYPI: ${{ secrets.POETRY_PYPI_TOKEN_PYPI }}
+
+      - uses: EndBug/add-and-commit@v9
+        if: github.ref == 'refs/heads/main' && steps.release.outputs.version != ''
+        with:
+          message: "chore(version): bump"
+          default_author: github_actions
+          add: pyproject.toml

@@ -1,12 +1,23 @@
 [tool.poetry]
 name = "fuzzy-secret-stdout"
 version = "0.1.0"
-description = ""
+description = "Small utility to fuzzy search from a secret store and print the value to stdout"
 authors = ["kiran94"]
 readme = "README.md"
+license = "MIT"
+homepage = "https://pypi.org/project/fuzzy-secret-stdout/"
+repository = "https://github.com/kiran94/fuzzy-secret-stdout"
+documentation = "https://github.com/kiran94/fuzzy-secret-stdout/blob/main/README.md"
+keywords = ["aws", "secrets", "ssm", "parameter-store"]
+classifiers = [
+    "Intended Audience :: Developers",
+    "Operating System :: OS Independent",
+    "Topic :: Utilities",
+    "Topic :: Software Development"
+]
 
 [tool.poetry.dependencies]
-python = "^3.11"
+python = "^3.9"
 boto3 = "^1.33.11"
 pyfzf = "^0.3.1"
 rich = "^13.7.0"
