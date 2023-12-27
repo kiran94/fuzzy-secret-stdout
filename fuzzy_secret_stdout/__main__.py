@@ -1,4 +1,5 @@
 import sys
+import argparse
 import logging
 
 from pyfzf.pyfzf import FzfPrompt
@@ -14,9 +15,13 @@ logger = logging.getLogger(__name__)
 
 
 def main():
-    search = FzfPrompt()
+    parser = argparse.ArgumentParser()
+    parser.add_argument('-i', '--integration', choices=Integration.list_options(), default=Integration.AWS_SSM, type=Integration)
 
-    integration_client = create_integration(Integration.AWS_SSM)
+    args = parser.parse_args(sys.argv[1:])
+
+    search = FzfPrompt()
+    integration_client = create_integration(args.integration)
 
     with Live(Spinner('dots', text=Text('Loading')), transient=True):
         result: list[SecretStoreItem] = integration_client.fetch_all()
