@@ -94,7 +94,7 @@ jobs:
       - name: Release
         id: release
         uses: go-semantic-release/action@v1
-        # if: github.ref == 'refs/heads/main'
+        if: github.ref == 'refs/heads/main'
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           allow-initial-development-versions: true
@@ -102,7 +102,7 @@ jobs:
       # Prerelease
       - name: Bump Poetry (Prerelease)
         id: prerelease
-        if: github.event_name == 'pull_request'
+        if: github.ref != 'refs/heads/main' && github.event_name == 'pull_request'
         run: |
           python -m pip install semantic-version
 
@@ -125,7 +125,7 @@ jobs:
           echo "VERSION=${VERSION}" >> $GITHUB_OUTPUT
 
       - name: Deploy (Prerelease)
-        if: github.event_name == 'pull_request'
+        if: github.ref != 'refs/heads/main' && github.event_name == 'pull_request'
         run: |
           poetry build
           poetry publish -u __token__ -p $POETRY_PYPI_TOKEN_PYPI
@@ -133,7 +133,7 @@ jobs:
           POETRY_PYPI_TOKEN_PYPI: ${{ secrets.POETRY_PYPI_TOKEN_PYPI }}
 
       - name: Comment (Prerelease)
-        if: github.event_name == 'pull_request'
+        if: github.ref != 'refs/heads/main' && github.event_name == 'pull_request'
         uses: thollander/actions-comment-pull-request@v2
         with:
           message: |
@@ -149,11 +149,11 @@ jobs:
 
       # Main Release
       - name: Bump Poetry
-        if: steps.release.outputs.version != ''
+        if: github.ref == 'refs/heads/main' && steps.release.outputs.version != ''
         run: poetry version ${{ steps.release.outputs.version }}
 
       - name: Deploy
-        if:  && steps.release.outputs.version != ''
+        if: github.ref == 'refs/heads/main' && steps.release.outputs.version != ''
         run: |
           poetry build
           poetry publish -u __token__ -p $POETRY_PYPI_TOKEN_PYPI
@@ -161,7 +161,7 @@ jobs:
           POETRY_PYPI_TOKEN_PYPI: ${{ secrets.POETRY_PYPI_TOKEN_PYPI }}
 
       - uses: EndBug/add-and-commit@v9
-        if:  steps.release.outputs.version != ''
+        if: github.ref == 'refs/heads/main' && steps.release.outputs.version != ''
         with:
           message: "chore(version): bump"
           default_author: github_actions
