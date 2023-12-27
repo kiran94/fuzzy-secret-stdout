@@ -17,3 +17,6 @@ def test_create_integration_ssm(mock_boto: Mock):
 def test_create_integration_unimplemented():
     with pytest.raises(NotImplementedError, match='integration DUMMY not implemented'):
         create_integration("DUMMY")
+
+def test_integration_list_options():
+    assert Integration.list_options() == ['AWS_SSM', 'AWS_SECRET_MAN']
