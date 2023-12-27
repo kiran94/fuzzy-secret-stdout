@@ -10,7 +10,7 @@ class Integration(str, Enum):
     AWS_SECRET_MAN = "AWS_SECRET_MAN"
 
     @staticmethod
-    def list_options():
+    def list_options() -> list[str]:
         return [x.value for x in Integration]
 
 
