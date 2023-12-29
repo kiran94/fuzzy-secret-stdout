@@ -18,5 +18,10 @@ lint:
 format:
 	poetry run ruff check --fix .
 
-run:
-	poetry run python -m fuzzy_secret_stdout
+run: run_ssm
+
+run_ssm:
+	poetry run python -m fuzzy_secret_stdout -i AWS_SSM
+
+run_secretmanager:
+	poetry run python -m fuzzy_secret_stdout -i AWS_SECRET_MAN | jq .
