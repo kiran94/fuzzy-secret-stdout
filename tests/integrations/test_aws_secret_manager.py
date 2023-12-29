@@ -88,3 +88,19 @@ def test_fetch_all_keys_pagination():
     ]
 
     assert mock_secret_man.list_secrets.call_args_list == [call(MaxResults=3), call(NextToken='token1', MaxResults=3), call(NextToken='token2', MaxResults=3)]
+
+def test_fetch_secrets():
+    input = ['param1']
+
+    mock_secret_man: Mock = Mock()
+    mock_secret_man.batch_get_secret_value.return_value = {
+        'SecretValues': [
+            {'Name': 'param1', 'SecretString': 'value1'}
+        ]
+    }
+
+    integration = AWSSecretManager(mock_secret_man)
+    result = integration.fetch_secrets(input)
+
+    assert result == [SecretStoreItem(key='param1', value='value1')]
+    assert mock_secret_man.batch_get_secret_value.call_args_list == [call(SecretIdList=['param1'])]
