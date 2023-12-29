@@ -2,7 +2,7 @@ resource "github_repository" "main" {
   name         = "fuzzy-secret-stdout"
   description  = "Small utility to fuzzy search from a secret store and print the value to stdout"
   visibility   = "public"
-  homepage_url = ""
+  homepage_url = "https://pypi.org/project/fuzzy-secret-stdout/"
 
   has_projects  = false
   has_wiki      = false
