@@ -16,6 +16,7 @@ Dependencies:
 
 * Python 3.9+
 * [`fzf`](https://github.com/junegunn/fzf?tab=readme-ov-file#installation)
+* Valid [AWS Credentials](https://boto3.amazonaws.com/v1/documentation/api/latest/guide/credentials.html) available your terminal context
 
 ## Usage
 
@@ -27,5 +28,19 @@ fuzzy-secret-stdout
 fss
 
 # fuzzy search and explicitly specify the secret store to search
-fss -i AWS_SSM
+fss -i AWS_SECRET_MAN
+
+# fuzzy search aws secret manager and pipe into jq
+fss -i AWS_SECRET_MAN | jq .
 ```
+
+## Integrations
+
+`fuzzy-secret-stdout` supports the following secret stores:
+
+| Secret Store                                                                                                                             | Command Line Argument  |
+| -------------                                                                                                                            | ---------------------- |
+| [AWS Systems Manager Parameter Store](https://docs.aws.amazon.com/systems-manager/latest/userguide/systems-manager-parameter-store.html) | `AWS_SSM`              |
+| [AWS Secrets Manager](https://docs.aws.amazon.com/secretsmanager/latest/userguide/intro.html)                                            | `AWS_SECRET_MAN`       |
+
+The *Command Line Argument* above is passed as the `-i` flag. `AWS_SSM` is the default.
