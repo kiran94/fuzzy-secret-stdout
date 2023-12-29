@@ -2,7 +2,6 @@ from unittest.mock import Mock, call
 from fuzzy_secret_stdout.integrations.aws_ssm import AWSParameterStore
 from fuzzy_secret_stdout.models import SecretStoreItem
 
-
 import pytest
 
 
