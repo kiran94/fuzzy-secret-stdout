@@ -12,27 +12,11 @@ class AWSParameterStore(SecretIntegration):
         self._boto_client = boto_client
 
     def fetch_all(self, max_batch_results: Optional[int] = 3) -> list[SecretStoreItem]:
-        logging.info("fetching all ssm keys with batch results %s", max_batch_results)
 
-        raw_result: dict = self._boto_client.describe_parameters(MaxResults=max_batch_results)
+        def inner(boto_client, **kwargs):
+            return boto_client.describe_parameters(**kwargs)
 
-        if 'Parameters' not in raw_result or not raw_result['Parameters']:
-            logging.debug("could not find any ssm keys")
-            return []
-
-        results: list[SecretStoreItem] = []
-        for parameter in raw_result['Parameters']:
-            results.append(SecretStoreItem(parameter['Name']))
-
-        while 'NextToken' in raw_result:
-            logging.info("found %s ssm keys and a NextToken, fetching next batch", len(raw_result['Parameters']))
-
-            raw_result = self._boto_client.describe_parameters(NextToken=raw_result['NextToken'], MaxResults=max_batch_results)
-            for parameter in raw_result['Parameters']:
-                results.append(SecretStoreItem(parameter['Name']))
-
-        logging.info("found %s total ssm keys", len(results))
-        return results
+        return self._paginate_results(inner, max_batch_results, 'Parameters', 'Name', 'ssm')
 
     def fetch_secrets(self, item_names: list[str]) -> list[SecretStoreItem]:
         result = self._boto_client.get_parameters(Names=item_names, WithDecryption=True)
