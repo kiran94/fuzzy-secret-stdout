@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "fuzzy-secret-stdout"
-version = "0.2.0"
+version = "0.3.0"
 description = "Small utility to fuzzy search from a secret store and print the value to stdout"
 authors = ["kiran94"]
 readme = "README.md"
