@@ -15,18 +15,17 @@ from rich.text import Text
 logger = logging.getLogger(__name__)
 
 
-
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument("-i", "--integration", choices=Integration.list_options(), default=Integration.AWS_SSM, type=Integration)
-    parser.add_argument("-b", '--max-batch-size', type=int, default=os.environ.get("FSS_MAX_BATCH_RESULTS", 50), dest='max_batch_results')
+    parser.add_argument('-i', '--integration', choices=Integration.list_options(), default=Integration.AWS_SSM, type=Integration)
+    parser.add_argument('-b', '--max-batch-size', type=int, default=os.environ.get('FSS_MAX_BATCH_RESULTS', 50), dest='max_batch_results')
 
     args = parser.parse_args(sys.argv[1:])
 
     search = FzfPrompt()
     integration_client = create_integration(args.integration)
 
-    with Live(Spinner("dots", text=Text("Loading")), transient=True):
+    with Live(Spinner('dots', text=Text('Loading')), transient=True):
         result: list[SecretStoreItem] = integration_client.fetch_all(max_batch_results=args.max_batch_results)
 
     keys: list[str] = [x.key for x in result]
@@ -34,7 +33,7 @@ def main():
     selected: list[str] = search.prompt(keys)
 
     if not selected:
-        logger.debug("nothing was selected, exiting early.")
+        logger.debug('nothing was selected, exiting early.')
         return
 
     result: list[SecretStoreItem] = integration_client.fetch_secrets(selected)
@@ -43,5 +42,5 @@ def main():
         sys.stdout.write(current_result.value)
 
 
-if __name__ == "__main__":  # pragma: nocover
+if __name__ == '__main__':  # pragma: nocover
     main()
