@@ -9,7 +9,7 @@ logger = logging.getLogger(__name__)
 class SecretIntegration(ABC):
 
     @abstractmethod
-    def fetch_all(self, max_batch_results: Optional[int] = 3) -> list[SecretStoreItem]: # pragma: nocover
+    def fetch_all(self, max_batch_results: Optional[int] = 50) -> list[SecretStoreItem]: # pragma: nocover
         pass
 
     @abstractmethod
