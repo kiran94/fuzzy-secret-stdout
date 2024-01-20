@@ -17,7 +17,7 @@ def test_fetch_all_no_parameters(list_secrets_return: dict):
     result = integration.fetch_all()
 
     assert result == []
-    assert mock_secret_man.list_secrets.call_args_list == [call(MaxResults=3)]
+    assert mock_secret_man.list_secrets.call_args_list == [call(MaxResults=50)]
 
 
 @pytest.mark.parametrize("max_results", [
@@ -48,7 +48,7 @@ def test_fetch_all__keys_no_pagination():
     integration = AWSSecretManager(mock_secret_man)
     result = integration.fetch_all()
 
-    assert mock_secret_man.list_secrets.call_args_list == [call(MaxResults=3)]
+    assert mock_secret_man.list_secrets.call_args_list == [call(MaxResults=50)]
     assert result == [
         SecretStoreItem(key='param1'),
         SecretStoreItem(key='param2'),
@@ -87,7 +87,7 @@ def test_fetch_all_keys_pagination():
         SecretStoreItem(key='param4')
     ]
 
-    assert mock_secret_man.list_secrets.call_args_list == [call(MaxResults=3), call(NextToken='token1', MaxResults=3), call(NextToken='token2', MaxResults=3)]
+    assert mock_secret_man.list_secrets.call_args_list == [call(MaxResults=50), call(NextToken='token1', MaxResults=50), call(NextToken='token2', MaxResults=50)]
 
 def test_fetch_secrets():
     input = ['param1']

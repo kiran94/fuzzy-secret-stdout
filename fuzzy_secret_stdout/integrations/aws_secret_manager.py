@@ -11,7 +11,7 @@ class AWSSecretManager(SecretIntegration):
     def __init__(self, boto_client) -> None:
         self._boto_client = boto_client
 
-    def fetch_all(self, max_batch_results: Optional[int] = 3) -> list[SecretStoreItem]:
+    def fetch_all(self, max_batch_results: Optional[int] = 50) -> list[SecretStoreItem]:
 
         def inner(boto_client, **kwargs):
             return boto_client.list_secrets(**kwargs)

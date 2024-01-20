@@ -44,3 +44,9 @@ fss -i AWS_SECRET_MAN | jq .
 | [AWS Secrets Manager](https://docs.aws.amazon.com/secretsmanager/latest/userguide/intro.html)                                            | `AWS_SECRET_MAN`       |
 
 The *Command Line Argument* above is passed as the `-i` flag. `AWS_SSM` is the default.
+
+## Environment Variables
+
+| Environment Variables   | Description                                                                                                                                                                                                                       | Default  |
+| ---------------------   | ----------                                                                                                                                                                                                                       | -------- |
+| `FSS_MAX_BATCH_RESULTS` | The maximum number of results to request from the underlying secret service per batch. Note that this value might be rejected by the underlying secret service. For example `boto3` validates this value to be <= 50 for AWS SSM | `50`     |
